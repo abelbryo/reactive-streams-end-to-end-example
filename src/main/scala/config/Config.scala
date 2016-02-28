@@ -15,7 +15,7 @@ package object config {
     PGPASSWORD: String,
     PGDATABASE: String,
     PGHOST: String)
-  
+
   lazy val config: Config = ConfigFactory.load()
 
   lazy val esConfig: ElasticsearchConfig = config.as[ElasticsearchConfig]("elasticsearch")
