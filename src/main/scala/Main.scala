@@ -25,24 +25,16 @@ object Main extends App {
   val allTaxiDataQuery = sql"SELECT * FROM nyc_taxi_data;".as[TaxiRide]
 
   /**
-   * Creates a reactive-streams Publisher, not really useful yet,
-   * and does not begin execution of the query at this point.
-   *
-   * **CAVEAT**:
-   *   Set a transaction on the query to disable autocommit so it streams properly:
-   *   http://stackoverflow.com/a/31371423
+   * Create an akka-streams Source from a reactive-streams publisher,
+   * entering akka-streams land where we get access to a richer API for stream element processing
    */
-  val taxiRidesPublisher: DatabasePublisher[TaxiRide] = db.stream {
-    allTaxiDataQuery
-      .transactionally
-      .withStatementParameters(fetchSize = 5000)
+  val taxiRidesSource: Source[TaxiRide, NotUsed] = Source.fromPublisher {
+    db.stream {
+      allTaxiDataQuery
+        .transactionally
+        .withStatementParameters(fetchSize = 5000)
+    }
   }
-
-  /**
-   * Create an akka-stream Source from the publisher, entering akka-stream land
-   * where we get access to a richer API for stream element processing
-   */
-  val taxiRidesSource: Source[TaxiRide, NotUsed] = Source.fromPublisher(taxiRidesPublisher)
 
   /**
    * Construct a Flow[TaxiRide] that emits TaxiRideWithDescription elements from a function
