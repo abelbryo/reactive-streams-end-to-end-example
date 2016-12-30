@@ -24,3 +24,6 @@ To run, make sure to have these environment variables set:
     * PGHOST
 
 and `sbt run` will stream results from PostgreSQL to Elasticsearch, printing a tally to the console as it runs.
+
+
+Related blog post http://longcao.org/2016/03/10/reactive-streams-end-to-end-example
